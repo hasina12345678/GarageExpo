@@ -27,3 +27,13 @@ eas build --platform android --profile production # AAB pour Play Store
 rmdir /s /q node_modules
 del package-lock.json
 npm install
+
+## Export
+adb --version
+npx expo prebuild
+
+cd android
+gradlew assembleDebug
+
+APK généré ici
+android/app/build/outputs/apk/debug/app-debug.apk

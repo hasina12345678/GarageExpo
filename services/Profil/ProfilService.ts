@@ -1,4 +1,3 @@
-// services/Profil/ProfilService.ts
 import { 
   updatePassword, 
   reauthenticateWithCredential,
@@ -8,7 +7,7 @@ import {
 import { auth } from '../firebase';
 
 export default {
-  // Récupérer les informations de l'utilisateur
+  
   getUserInfo: () => {
     const user = auth.currentUser;
     if (!user) {
@@ -26,7 +25,7 @@ export default {
     };
   },
 
-  // Changer le mot de passe
+  
   changePassword: async (currentPassword: string, newPassword: string) => {
     try {
       const user = auth.currentUser;
@@ -35,11 +34,9 @@ export default {
         throw new Error('Utilisateur non connecté');
       }
 
-      // Ré-authentifier l'utilisateur avec l'ancien mot de passe
       const credential = EmailAuthProvider.credential(user.email, currentPassword);
       await reauthenticateWithCredential(user, credential);
 
-      // Mettre à jour le mot de passe
       await updatePassword(user, newPassword);
       
       return { 
@@ -70,7 +67,6 @@ export default {
     }
   },
 
-  // Mettre à jour le nom d'affichage
   updateDisplayName: async (displayName: string) => {
     try {
       const user = auth.currentUser;
@@ -79,10 +75,7 @@ export default {
         throw new Error('Utilisateur non connecté');
       }
 
-      // Note: Dans Firebase Auth web, vous devez utiliser updateProfile
-      // Pour React Native, c'est différent
       console.log('Mise à jour du nom d\'affichage:', displayName);
-      // En attendant une implémentation Firebase correcte
       
       return { 
         success: true, 
@@ -96,7 +89,6 @@ export default {
     }
   },
 
-  // Vérifier si l'utilisateur est connecté
   isUserLoggedIn: () => {
     return !!auth.currentUser;
   },

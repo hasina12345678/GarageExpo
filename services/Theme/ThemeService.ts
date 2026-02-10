@@ -1,4 +1,3 @@
-// services/Theme/ThemeService.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type ThemeType = 'light' | 'professional' | 'blue' | 'orange';

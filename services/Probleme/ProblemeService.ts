@@ -1,4 +1,3 @@
-// services/Probleme/ProblemeService.ts
 import { db } from '../firebase';
 import { 
   collection, 
@@ -16,7 +15,7 @@ import { auth } from '../firebase';
 export interface PanneType {
   id?: string;
   nom: string;
-  duree: number; // en heures
+  duree: number; 
   prix: number;
   description?: string;
 }
@@ -48,7 +47,6 @@ export interface Voiture {
 }
 
 export default {
-  // Récupérer toutes les voitures de l'utilisateur
   getVoitures: async (): Promise<Voiture[]> => {
     try {
       const user = auth.currentUser;
@@ -76,7 +74,6 @@ export default {
     }
   },
 
-  // Récupérer tous les types de panne
   getPanneTypes: async (): Promise<PanneType[]> => {
     try {
       const panneTypesRef = collection(db, 'panneTypes');
@@ -94,7 +91,6 @@ export default {
         });
       });
       
-      // Trier par nom
       return panneTypes.sort((a, b) => a.nom.localeCompare(b.nom));
     } catch (error) {
       console.error('Erreur lors de la récupération des types de panne:', error);
@@ -102,7 +98,6 @@ export default {
     }
   },
 
-  // Déclarer une nouvelle panne
   declarerPanne: async (
     idVoiture: string, 
     panneTypeIds: string[]
@@ -111,7 +106,6 @@ export default {
       const user = auth.currentUser;
       if (!user) throw new Error('Utilisateur non connecté');
 
-      // Vérifier que la voiture appartient à l'utilisateur
       const voitureRef = doc(db, 'voitures', idVoiture);
       const voitureDoc = await getDoc(voitureRef);
       
@@ -124,7 +118,6 @@ export default {
         throw new Error('Cette voiture ne vous appartient pas');
       }
 
-      // 1. Créer la panne principale
       const nouvellePanne: Omit<Panne, 'id'> = {
         idVoiture,
         dateHeure: new Date()
@@ -137,7 +130,6 @@ export default {
 
       const panneId = panneRef.id;
 
-      // 2. Créer les détails de panne pour chaque type sélectionné
       for (const panneTypeId of panneTypeIds) {
         const panneDetails: Omit<PanneDetails, 'id'> = {
           idPanne: panneId,
@@ -147,7 +139,6 @@ export default {
         await addDoc(collection(db, 'panneDetails'), panneDetails);
       }
 
-      // 3. Créer le statut de la panne (non réparé)
       const panneStatut: Omit<PanneStatut, 'id'> = {
         idPanne: panneId,
         idStatutForPanne: '1', // non réparé
@@ -158,9 +149,6 @@ export default {
         ...panneStatut,
         dateHeure: serverTimestamp(),
       });
-
-      // 4. Mettre à jour la panne avec le statut
-      // (optionnel, si vous voulez garder le statut dans la panne aussi)
 
       return { 
         success: true, 
@@ -176,7 +164,6 @@ export default {
     }
   },
 
-  // Calculer l'estimation totale (durée et prix)
   calculerEstimation: async (panneTypeIds: string[]): Promise<{ 
     dureeTotale: number; 
     prixTotal: number;
@@ -187,7 +174,7 @@ export default {
     }>;
   }> => {
     try {
-      let dureeTotale = 0; // en heures
+      let dureeTotale = 0; 
       let prixTotal = 0;
       const details: Array<{ nom: string; duree: number; prix: number }> = [];
 
@@ -218,7 +205,6 @@ export default {
     }
   },
 
-  // Formater la durée (heures/minutes)
   formaterDuree: (dureeHeures: number): string => {
     if (dureeHeures < 1) {
       const minutes = Math.round(dureeHeures * 60);
@@ -235,7 +221,6 @@ export default {
     return `${heures}h${minutes > 0 ? `${minutes}min` : ''}`;
   },
 
-  // Formater le prix
   formaterPrix: (prix: number): string => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
@@ -244,7 +229,6 @@ export default {
     }).format(prix);
   },
 
-  // Vérifier si l'utilisateur a des voitures
   aDesVoitures: async (): Promise<boolean> => {
     try {
       const voitures = await problemeService.getVoitures();
@@ -255,7 +239,6 @@ export default {
   },
 };
 
-// Instance pour l'auto-référence
 const problemeService = {
   getVoitures: async () => {
     const user = auth.currentUser;

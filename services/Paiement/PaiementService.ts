@@ -86,7 +86,6 @@ export default {
           continue;
         }
 
-        // Récupérer le statut le plus récent de la panne
         const statutsRef = collection(db, 'panneStatuts');
         const qStatuts = query(
           statutsRef, 
@@ -107,7 +106,6 @@ export default {
           }
         });
 
-        // ne garder que les pannes avec statut (réparé et non payé)
         if (statutLePlusRecent !== '2') {
           continue;
         }
@@ -146,7 +144,6 @@ export default {
 
         const montantRestant = montantTotal - montantDejaPaye;
 
-        // si il reste à payer
         if (montantRestant > 0) {
           pannesAPayer.push({
             id: panneDoc.id,
@@ -162,7 +159,6 @@ export default {
         }
       }
 
-      // Trier les pannes par date décroissante
       pannesAPayer.sort((a, b) => b.dateHeure.getTime() - a.dateHeure.getTime());
 
       return pannesAPayer;
@@ -242,11 +238,9 @@ export default {
         dateHeure: serverTimestamp(),
       });
 
-      // le nouveau montant payé
       const montantTotalPaye = montantDejaPaye + montant;
       const montantRestantApres = montantTotal - montantTotalPaye;
 
-      // le statut de paiement
       let idStatutForPaiement = '2'; // payé partiel par défaut
       
       if (montantRestantApres === 0) {
@@ -266,7 +260,6 @@ export default {
         dateHeure: serverTimestamp(),
       });
 
-      // 8. Si paiement complet, mettre à jour le statut de la panne
       if (montantRestantApres === 0) {
         await updateDoc(panneRef, {
           idStatutForPanne: '3', // payé
@@ -287,7 +280,6 @@ export default {
     }
   },
 
-  // Formater le prix
   formaterPrix: (prix: number): string => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
@@ -296,7 +288,6 @@ export default {
     }).format(prix);
   },
 
-  // Générer des suggestions de montant
   genererSuggestionsMontant: (montantRestant: number): number[] => {
     const suggestions: number[] = [];
     
@@ -315,11 +306,9 @@ export default {
     // Suggestion 3: Montant complet
     suggestions.push(montantRestant);
     
-    // Éliminer les doublons et trier
     return [...new Set(suggestions)].sort((a, b) => a - b);
   },
 
-  // Vérifier si l'utilisateur a des pannes à payer
   aDesPannesAPayer: async (): Promise<boolean> => {
     try {
       const pannes = await paiementService.getPannesAPayer();
@@ -358,22 +347,16 @@ async function creerStatutPannePaye(idPanne: string): Promise<{ success: boolean
   }
 }
 
-
-
-// Fonction updateDoc manquante
 const updateDoc = async (ref: any, data: any) => {
-  // Implémentation de updateDoc si nécessaire
   console.log('Mise à jour du document:', ref, data);
 };
 
 
-// Instance pour l'auto-référence
 const paiementService = {
   getPannesAPayer: async () => {
     const user = auth.currentUser;
     if (!user) return [];
     
-    // Implémentation simplifiée
     return [];
   }
 };
