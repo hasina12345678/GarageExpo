@@ -129,12 +129,14 @@ const VoitureStyles = StyleSheet.create({
     fontSize: Fonts.small,
     color: Colors.gray600,
     width: 100,
+    
   },
   infoValue: {
     fontSize: Fonts.body,
     color: Colors.gray800,
     fontWeight: '500',
     flex: 1,
+    marginLeft:145
   },
   
   // Statut pannes

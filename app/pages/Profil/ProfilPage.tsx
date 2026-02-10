@@ -1,4 +1,3 @@
-// app/pages/Profil/ProfilPage.tsx
 import React, { useState, useEffect } from 'react';
 import {
 	View,
@@ -208,7 +207,6 @@ export default function ProfilPage() {
 				</View>
 			</View>
 			
-			{/* Informations de connexion */}
 			<Text style={ProfilStyles.sectionTitle}>
 				Historique de connexion
 			</Text>
@@ -240,7 +238,6 @@ export default function ProfilPage() {
 			</View>
 			</View>
 			
-			{/* Actions - SEULEMENT changement de mot de passe */}
 			<View style={ProfilStyles.actionsContainer}>
 			<TouchableOpacity 
 				style={ProfilStyles.actionButton}
@@ -253,8 +250,7 @@ export default function ProfilPage() {
 			</TouchableOpacity>
 			</View>
 		</ScrollView>
-		
-		{/* Modal pour changer le mot de passe */}
+	
 		<Modal
 			visible={showPasswordForm}
 			transparent={true}

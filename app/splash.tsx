@@ -50,7 +50,6 @@ export default function SplashScreen() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Interpolations
   const spin = spinValue.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
@@ -58,7 +57,7 @@ export default function SplashScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Animation du pneu qui tourne */}
+     
       <Animated.View 
         style={[
           styles.tireContainer,
@@ -72,26 +71,23 @@ export default function SplashScreen() {
         ]}
       >
         <View style={styles.tire}>
-          {/* Rayons du pneu */}
+          
           <View style={styles.spoke} />
           <View style={[styles.spoke, styles.spoke45]} />
           <View style={[styles.spoke, styles.spoke90]} />
           <View style={[styles.spoke, styles.spoke135]} />
           
-          {/* Centre du pneu */}
           <View style={styles.hub}>
             <View style={styles.hubCenter} />
           </View>
         </View>
       </Animated.View>
 
-      {/* Texte */}
       <Animated.View style={{ opacity: fadeValue }}>
         <Text style={styles.title}>MyGarage</Text>
         <Text style={styles.subtitle}>Préparation en cours...</Text>
       </Animated.View>
 
-      {/* Points de chargement animés */}
       <View style={styles.dotsContainer}>
         {[0, 1, 2].map((index) => {
           const dotAnim = useRef(new Animated.Value(0)).current;

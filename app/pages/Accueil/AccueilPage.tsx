@@ -20,7 +20,7 @@ import { Colors } from '../../../styles/Common.css';
 import { router } from 'expo-router';
 
 export default function AccueilPage() {
-  
+	
 	const [pannesEnCours, setPannesEnCours] = useState<PanneEnCours[]>([]);
 	const [statistiques, setStatistiques] = useState<Statistiques | null>(null);
 	const [loading, setLoading] = useState(true);

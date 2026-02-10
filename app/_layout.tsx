@@ -14,7 +14,7 @@ export default function RootLayout() {
 
 	return (
 		<View style={{ flex: 1, paddingTop: 28 }}>
-		{/* Écouteur de notifications */}
+		
 		<NotificationListener />
 		
 		{showNavbar && (

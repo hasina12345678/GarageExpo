@@ -1,26 +1,23 @@
 // styles/Theme.css.js
 import { StyleSheet } from 'react-native';
-import { defaultColors as Colors, Fonts, Sizes, Layout, Shadows } from './Common.css';
+import { Colors, Fonts, Sizes, Layout, Shadows } from './Common.css';
 
 const ThemeStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.gray50,
-    marginTop: 20,
   },
   scrollContainer: {
     flexGrow: 1,
     paddingBottom: Sizes.xl,
   },
   headerContainer: {
-    ...Layout.row,
-    ...Layout.spaceBetween,
-    ...Layout.alignCenter,
     backgroundColor: Colors.white,
-    paddingHorizontal: Sizes.lg,
     paddingVertical: Sizes.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.gray200,
+    paddingHorizontal: Sizes.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     ...Shadows.subtle,
   },
   backButton: {
@@ -32,11 +29,12 @@ const ThemeStyles = StyleSheet.create({
     color: Colors.gray800,
   },
   contentContainer: {
-    padding: Sizes.lg,
+    paddingHorizontal: Sizes.lg,
+    paddingTop: Sizes.lg,
   },
   sectionTitle: {
     fontSize: Fonts.h3,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: Colors.gray800,
     marginBottom: Sizes.sm,
   },
@@ -44,7 +42,7 @@ const ThemeStyles = StyleSheet.create({
     fontSize: Fonts.body,
     color: Colors.gray600,
     marginBottom: Sizes.xl,
-    lineHeight: 22,
+    lineHeight: 20,
   },
   themesList: {
     marginBottom: Sizes.xl,
@@ -54,24 +52,24 @@ const ThemeStyles = StyleSheet.create({
     borderRadius: 12,
     padding: Sizes.lg,
     marginBottom: Sizes.md,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: Colors.gray200,
     ...Shadows.subtle,
   },
   themeCardActive: {
-    borderColor: Colors.blue,
     borderWidth: 2,
   },
   themeHeader: {
-    ...Layout.row,
-    ...Layout.alignCenter,
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: Sizes.lg,
   },
   themeIcon: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    ...Layout.center,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: Sizes.md,
   },
   themeInfo: {
@@ -80,7 +78,6 @@ const ThemeStyles = StyleSheet.create({
   themeName: {
     fontSize: Fonts.h4,
     fontWeight: 'bold',
-    color: Colors.gray800,
     marginBottom: Sizes.xs,
   },
   themeStatus: {
@@ -88,38 +85,33 @@ const ThemeStyles = StyleSheet.create({
     color: Colors.gray500,
   },
   colorPreview: {
-    ...Layout.row,
-    ...Layout.wrap,
-    marginTop: Sizes.sm,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
   colorBox: {
-    width: 70,
-    height: 70,
+    width: '23%',
+    aspectRatio: 1,
     borderRadius: 8,
-    marginRight: Sizes.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: Sizes.sm,
-    ...Layout.center,
-    ...Shadows.subtle,
   },
   colorLabel: {
     fontSize: Fonts.xsmall,
     color: Colors.white,
     fontWeight: '600',
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textAlign: 'center',
   },
   infoCard: {
-    ...Layout.row,
-    backgroundColor: Colors.blue + '10',
+    backgroundColor: Colors.gray50,
     borderRadius: 12,
     padding: Sizes.lg,
-    borderWidth: 1,
-    borderColor: Colors.blue + '30',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   infoIcon: {
     marginRight: Sizes.md,
-    marginTop: Sizes.xs,
   },
   infoContent: {
     flex: 1,
@@ -127,7 +119,7 @@ const ThemeStyles = StyleSheet.create({
   infoTitle: {
     fontSize: Fonts.h4,
     fontWeight: '600',
-    color: Colors.blue,
+    color: Colors.gray800,
     marginBottom: Sizes.sm,
   },
   infoText: {

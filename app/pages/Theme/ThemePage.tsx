@@ -26,7 +26,7 @@ export default function ThemePage() {
         setCurrentTheme(themeId);
         Alert.alert(
           'Thème changé',
-          'Le thème a été changé avec succès. Redémarrez l\'application pour voir tous les changements.',
+          'Le thème a été changé avec succès.',
           [{ text: 'OK' }]
         );
       }

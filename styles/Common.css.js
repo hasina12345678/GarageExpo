@@ -1,40 +1,11 @@
-// styles/Common.css.js
 import { Dimensions } from 'react-native';
 import { Platform } from 'react-native';
 import themeService from '../services/Theme/ThemeService';
 
 const { width, height } = Dimensions.get('window');
 
-// Récupérer les couleurs dynamiques du thème actuel
 export const getColors = () => themeService.getColors();
 
-// Les couleurs par défaut (thème light) pour compatibilité
-export const defaultColors = {
-  primary: '#FFFFFF',
-  secondary: '#F8F9FA',
-  accent: '#4A5568',
-  accentLight: '#718096',
-  border: '#E2E8F0',
-  surface: '#FFFFFF',
-  blue: '#4299E1',
-  blueDark: '#3182CE',
-  white: '#FFFFFF',
-  gray50: '#F7FAFC',
-  gray100: '#EDF2F7',
-  gray200: '#E2E8F0',
-  gray300: '#CBD5E0',
-  gray400: '#A0AEC0',
-  gray500: '#718096',
-  gray600: '#4A5568',
-  gray700: '#2D3748',
-  gray800: '#1A202C',
-  success: '#38A169',
-  warning: '#D69E2E',
-  danger: '#E53E3E',
-  info: '#4299E1',
-};
-
-// Fonction pour obtenir dynamiquement les couleurs
 export const Colors = getColors();
 
 export const Fonts = {
@@ -78,7 +49,6 @@ export const Layout = {
   absoluteFill: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
 };
 
-// Fonction pour obtenir les shadows dynamiquement
 export const getShadows = () => {
   const colors = getColors();
   return {
@@ -108,11 +78,8 @@ export const getShadows = () => {
 
 export const Shadows = getShadows();
 
-// Fonction pour obtenir les components dynamiquement
 export const getComponents = () => {
   const colors = getColors();
-  const currentShadows = getShadows();
-  
   return {
     button: {
       backgroundColor: colors.blue,
@@ -141,7 +108,7 @@ export const getComponents = () => {
       backgroundColor: colors.card || colors.white,
       borderRadius: 8,
       padding: Sizes.lg,
-      ...currentShadows.subtle,
+      ...getShadows().subtle,
     },
   };
 };

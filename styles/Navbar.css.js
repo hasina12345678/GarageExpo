@@ -54,6 +54,13 @@ const NavbarStyles = StyleSheet.create({
     color: Colors.gray600,
   },
   
+  logoImage: {
+    width: 100, // Ajustez cette valeur
+    height: 30, // Ajustez cette valeur
+    marginLeft: 0, // Optionnel pour l'alignement
+    marginTop:9
+},
+
   // Navigation principale - 100% width
   navContainer: {
     ...Layout.row,
@@ -81,7 +88,7 @@ const NavbarStyles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 14,
-    backgroundColor: Colors.gray100,
+    backgroundColor: Colors.primary,
     ...Layout.center,
     marginBottom: Sizes.xs,
     position: 'relative', // Important pour le positionnement du badge

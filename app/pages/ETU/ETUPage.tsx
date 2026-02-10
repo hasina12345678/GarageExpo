@@ -11,7 +11,6 @@ export default function ETUPage() {
     {
       nom: 'Hasina',
       etu: 'ETU003519',
-      role: 'Développeur Fullstack',
       couleur: '#4299E1',
       email: 'andrianirinahasina07@gmail.com',
     },
@@ -19,19 +18,19 @@ export default function ETUPage() {
       nom: 'Manuelo',
       etu: 'ETU003661',
       couleur: '#38A169', 
-      email: 'manuelo@etu.univ-antananarivo.mg',
+      email: 'manuandrian76430121@gmail.com',
     },
     {
       nom: 'Fenitra',
-      etu: 'ETU003500',
+      etu: 'ETU003577',
       couleur: '#D69E2E', 
-      email: 'fenitra@etu.univ-antananarivo.mg',
+      email: 'fenitranyaratra@gmail.com',
     },
     {
       nom: 'Dylan',
-      etu: 'ETU003520',
+      etu: 'ETU003534',
       couleur: '#9F7AEA',
-      email: 'dylan@etu.univ-antananarivo.mg',
+      email: 'dylanfitiana07@gmail.com',
     },
   ];
 
@@ -42,7 +41,6 @@ export default function ETUPage() {
   return (
     <View style={ETUStyles.container}>
       <ScrollView contentContainerStyle={ETUStyles.scrollContainer}>
-        {/* Header */}
         <View style={ETUStyles.headerContainer}>
           <View style={ETUStyles.logoContainer}>
             <Icon name="school" size={60} color="#2D3748" />
@@ -53,13 +51,12 @@ export default function ETUPage() {
           </Text>
         </View>
 
-        {/* Liste des étudiants */}
         <View style={ETUStyles.sectionContainer}>
           <Text style={ETUStyles.sectionTitle}>Membres de l'équipe</Text>
           
           {etudiants.map((etudiant, index) => (
             <View key={index} style={ETUStyles.etudiantCard}>
-              {/* En-tête avec avatar */}
+             
               <View style={ETUStyles.cardHeader}>
                 <View style={[ETUStyles.avatarContainer, { backgroundColor: etudiant.couleur }]}>
                   <Text style={ETUStyles.avatarText}>
@@ -74,7 +71,7 @@ export default function ETUPage() {
                 </View>
               </View>
 
-              {/* Informations */}
+              
               <View style={ETUStyles.infoContainer}>
                 <View style={ETUStyles.infoRow}>
                   <View style={ETUStyles.infoItem}>
@@ -98,7 +95,6 @@ export default function ETUPage() {
           ))}
         </View>
 
-        {/* Informations du projet */}
         <View style={ETUStyles.projectContainer}>
           <Text style={ETUStyles.projectTitle}>À propos du projet</Text>
           <View style={ETUStyles.projectCard}>
@@ -120,15 +116,6 @@ export default function ETUPage() {
             </View>
           </View>
         </View>
-
-        {/* Bouton retour */}
-        {/* <TouchableOpacity 
-          style={ETUStyles.backButton}
-          onPress={() => router.back()}
-        >
-          <Icon name="arrow-back" size={20} color="#FFFFFF" />
-          <Text style={ETUStyles.backButtonText}>Retour</Text>
-        </TouchableOpacity> */}
       </ScrollView>
     </View>
   );

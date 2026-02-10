@@ -1,7 +1,7 @@
 // services/Theme/ThemeService.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type ThemeType = 'light' | 'dark' | 'professional' | 'blue';
+export type ThemeType = 'light' | 'professional' | 'blue' | 'orange';
 
 export interface ThemeColors {
   primary: string;
@@ -33,7 +33,38 @@ export interface ThemeColors {
 }
 
 const themes: Record<ThemeType, ThemeColors> = {
-  // Thème actuel (light)
+  // Thème orange (par défaut)
+  orange: {
+    primary: '#F7931e',
+    secondary: '#F9A742',
+    accent: '#4A5568',
+    accentLight: '#718096',
+    border: '#E0E0E0',
+    surface: '#FFFFFF',
+    blue: '#F7931e',
+    blueDark: '#D47A1A',
+    white: '#FFFFFF',
+    gray50: '#FAFAFA',
+    gray100: '#F5F5F5',
+    gray200: '#EEEEEE',
+    gray300: '#E0E0E0',
+    gray400: '#BDBDBD',
+    gray500: '#9E9E9E',
+    gray600: '#757575',
+    gray700: '#616161',
+    gray800: '#424242',
+    gray900: '#212121',
+    success: '#38A169',
+    warning: '#D69E2E',
+    danger: '#E53E3E',
+    info: '#4299E1',
+    background: '#FFFFFF',
+    text: '#212121',
+    textSecondary: '#616161',
+    card: '#FFFFFF',
+  },
+  
+  // Thème clair
   light: {
     primary: '#FFFFFF',
     secondary: '#F8F9FA',
@@ -63,37 +94,7 @@ const themes: Record<ThemeType, ThemeColors> = {
     card: '#FFFFFF',
   },
   
-  // Thème sombre
-  dark: {
-    primary: '#1A202C',
-    secondary: '#2D3748',
-    accent: '#CBD5E0',
-    accentLight: '#718096',
-    border: '#4A5568',
-    surface: '#2D3748',
-    blue: '#63B3ED',
-    blueDark: '#4299E1',
-    white: '#FFFFFF',
-    gray50: '#171923',
-    gray100: '#2D3748',
-    gray200: '#4A5568',
-    gray300: '#718096',
-    gray400: '#A0AEC0',
-    gray500: '#CBD5E0',
-    gray600: '#E2E8F0',
-    gray700: '#EDF2F7',
-    gray800: '#F7FAFC',
-    success: '#68D391',
-    warning: '#F6AD55',
-    danger: '#FC8181',
-    info: '#76E4F7',
-    background: '#1A202C',
-    text: '#F7FAFC',
-    textSecondary: '#CBD5E0',
-    card: '#2D3748',
-  },
-  
-  // Thème professionnel (bleu)
+  // Thème professionnel
   professional: {
     primary: '#FFFFFF',
     secondary: '#EBF8FF',
@@ -123,7 +124,7 @@ const themes: Record<ThemeType, ThemeColors> = {
     card: '#FFFFFF',
   },
   
-  // Thème garage (orange/bleu)
+  // Thème bleu garage
   blue: {
     primary: '#FFFFFF',
     secondary: '#F0F9FF',
@@ -155,13 +156,12 @@ const themes: Record<ThemeType, ThemeColors> = {
 };
 
 class ThemeService {
-  private currentTheme: ThemeType = 'light';
+  private currentTheme: ThemeType = 'orange';
   
   constructor() {
     this.loadTheme();
   }
   
-  // Charger le thème sauvegardé
   async loadTheme() {
     try {
       const savedTheme = await AsyncStorage.getItem('app_theme');
@@ -173,22 +173,18 @@ class ThemeService {
     }
   }
   
-  // Obtenir le thème actuel
   getCurrentTheme(): ThemeType {
     return this.currentTheme;
   }
   
-  // Obtenir les couleurs du thème actuel
   getColors(): ThemeColors {
     return themes[this.currentTheme];
   }
   
-  // Obtenir un thème spécifique
   getTheme(theme: ThemeType): ThemeColors {
     return themes[theme];
   }
   
-  // Changer de thème
   async setTheme(theme: ThemeType): Promise<boolean> {
     try {
       if (!themes[theme]) {
@@ -204,22 +200,19 @@ class ThemeService {
     }
   }
   
-  // Liste des thèmes disponibles
   getAvailableThemes(): Array<{ id: ThemeType; name: string; colors: ThemeColors }> {
     return [
+      { id: 'orange', name: 'Orange Garage', colors: themes.orange },
       { id: 'light', name: 'Clair', colors: themes.light },
-      { id: 'dark', name: 'Sombre', colors: themes.dark },
       { id: 'professional', name: 'Professionnel', colors: themes.professional },
       { id: 'blue', name: 'Bleu Garage', colors: themes.blue },
     ];
   }
   
-  // Réinitialiser au thème par défaut
   async resetTheme(): Promise<boolean> {
-    return await this.setTheme('light');
+    return await this.setTheme('orange');
   }
 }
 
-// Instance singleton
 export const themeService = new ThemeService();
 export default themeService;
