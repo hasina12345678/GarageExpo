@@ -5,7 +5,7 @@ export const extractUsernameFromEmail = (): string => {
     const user = auth.currentUser;
     
     if (!user || !user.email) {
-      return "Utilisateur";
+        return "Utilisateur";
     }
     
     const email = user.email;

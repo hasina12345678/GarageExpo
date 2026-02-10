@@ -182,7 +182,7 @@ export default {
             idUtilisateur: user.uid,
             idPanne,
             titre: '🚗 Panne réparée !',
-            texte: 'Votre véhicule est réparé. Vous pouvez venir le récupérer.',
+            texte: 'Votre véhicule est réparé. Vous pouvez procéder au paiement.',
             dateHeure: new Date(),
             vue: false,
             alreadyPush: false,
@@ -202,7 +202,7 @@ export default {
           try {
             await sendPushNotification(
               '🚗 Panne réparée !',
-              'Votre véhicule est réparé. Vous pouvez venir le récupérer.',
+              'Votre véhicule est réparé. Vous pouvez procéder au paiement.',
               { idPanne, type: 'reparation' }
             );
             

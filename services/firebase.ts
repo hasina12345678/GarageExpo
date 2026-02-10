@@ -12,17 +12,14 @@ const firebaseConfig = {
   appId: "1:553426867703:android:b66c2b1942849dac670af2"
 };
 
-// Initialiser Firebase
 const app = initializeApp(firebaseConfig);
 
-// Configurer Auth avec AsyncStorage pour React Native
 let auth;
 try {
   auth = initializeAuth(app, {
     persistence: getReactNativePersistence(AsyncStorage)
   });
 } catch (error) {
-  // Si déjà initialisé, utiliser getAuth
   auth = getAuth(app);
 }
 
