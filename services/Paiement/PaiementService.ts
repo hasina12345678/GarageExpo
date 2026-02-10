@@ -1,4 +1,3 @@
-// services/Paiement/PaiementService.ts
 import { db } from '../firebase';
 import { 
   collection, 
@@ -13,6 +12,7 @@ import {
   Timestamp 
 } from 'firebase/firestore';
 import { auth } from '../firebase';
+import { PanneStatut } from '../Probleme/ProblemeService';
 
 export interface PanneAPayer {
   id: string;
@@ -49,135 +49,130 @@ export interface StatutForPaiement {
 }
 
 export default {
-getPannesAPayer: async (): Promise<PanneAPayer[]> => {
-  try {
-    const user = auth.currentUser;
-    if (!user) throw new Error('Utilisateur non connecté');
+  getPannesAPayer: async (): Promise<PanneAPayer[]> => {
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error('Utilisateur non connecté');
 
-    // 1. Récupérer toutes les voitures de l'utilisateur
-    const voituresRef = collection(db, 'voitures');
-    const qVoitures = query(voituresRef, where('idUtilisateur', '==', user.uid));
-    const voituresSnapshot = await getDocs(qVoitures);
-    
-    const voituresMap = new Map();
-    const voitureIds: string[] = [];
-    voituresSnapshot.forEach((doc) => {
-      voitureIds.push(doc.id);
-      voituresMap.set(doc.id, {
-        matricule: doc.data().matricule,
-        marque: doc.data().marque,
-      });
-    });
-
-    // Si l'utilisateur n'a pas de voitures, retourner un tableau vide
-    if (voitureIds.length === 0) {
-      return [];
-    }
-
-    // 2. Récupérer les pannes des voitures de l'utilisateur
-    const pannesRef = collection(db, 'pannes');
-    const qPannes = query(pannesRef, where('idVoiture', 'in', voitureIds));
-    const pannesSnapshot = await getDocs(qPannes);
-
-    const pannesAPayer: PanneAPayer[] = [];
-
-    // 3. Pour chaque panne, vérifier son statut et calculer les montants
-    for (const panneDoc of pannesSnapshot.docs) {
-      const panneData = panneDoc.data();
-      const voitureInfo = voituresMap.get(panneData.idVoiture);
-
-      if (!voitureInfo) {
-        continue;
-      }
-
-      // 4. Récupérer le statut le plus récent de la panne
-      const statutsRef = collection(db, 'panneStatuts');
-      const qStatuts = query(
-        statutsRef, 
-        where('idPanne', '==', panneDoc.id)
-      );
-      const statutsSnapshot = await getDocs(qStatuts);
+      const voituresRef = collection(db, 'voitures');
+      const qVoitures = query(voituresRef, where('idUtilisateur', '==', user.uid));
+      const voituresSnapshot = await getDocs(qVoitures);
       
-      let statutLePlusRecent = null;
-      let dateStatutPlusRecent: Date | null = null;
-      
-      // Trouver le statut avec la date la plus récente manuellement
-      statutsSnapshot.forEach((docStatut) => {
-        const statutData = docStatut.data();
-        const dateStatut = statutData.dateHeure?.toDate() || new Date(0);
-        
-        if (!dateStatutPlusRecent || dateStatut > dateStatutPlusRecent) {
-          dateStatutPlusRecent = dateStatut;
-          statutLePlusRecent = statutData.idStatutForPanne;
-        }
-      });
-
-      // 5. Filtrer: ne garder que les pannes avec statut "2" (réparé et non payé)
-      if (statutLePlusRecent !== '2') {
-        continue;
-      }
-
-      // 6. Récupérer les détails de la panne
-      const detailsRef = collection(db, 'panneDetails');
-      const qDetails = query(detailsRef, where('idPanne', '==', panneDoc.id));
-      const detailsSnapshot = await getDocs(qDetails);
-
-      const detailsPannes: Array<{ nom: string; prix: number }> = [];
-      let montantTotal = 0;
-
-      for (const detailDoc of detailsSnapshot.docs) {
-        const detailData = detailDoc.data();
-        const panneTypeRef = doc(db, 'panneTypes', detailData.idPanneType);
-        const panneTypeDoc = await getDoc(panneTypeRef);
-        
-        if (panneTypeDoc.exists()) {
-          const panneTypeData = panneTypeDoc.data();
-          detailsPannes.push({
-            nom: panneTypeData.nom,
-            prix: panneTypeData.prix,
-          });
-          montantTotal += panneTypeData.prix;
-        }
-      }
-
-      // 7. Calculer le montant déjà payé
-      const paiementsRef = collection(db, 'paiements');
-      const qPaiements = query(paiementsRef, where('idPanne', '==', panneDoc.id));
-      const paiementsSnapshot = await getDocs(qPaiements);
-      
-      let montantDejaPaye = 0;
-      paiementsSnapshot.forEach((doc) => {
-        montantDejaPaye += doc.data().montant || 0;
-      });
-
-      const montantRestant = montantTotal - montantDejaPaye;
-
-      // 8. Ajouter seulement si il reste à payer
-      if (montantRestant > 0) {
-        pannesAPayer.push({
-          id: panneDoc.id,
-          idVoiture: panneData.idVoiture,
-          dateHeure: panneData.dateHeure?.toDate() || new Date(),
-          matriculeVoiture: voitureInfo.matricule,
-          marqueVoiture: voitureInfo.marque,
-          detailsPannes,
-          montantTotal,
-          montantDejaPaye,
-          montantRestant,
+      const voituresMap = new Map();
+      const voitureIds: string[] = [];
+      voituresSnapshot.forEach((doc) => {
+        voitureIds.push(doc.id);
+        voituresMap.set(doc.id, {
+          matricule: doc.data().matricule,
+          marque: doc.data().marque,
         });
+      });
+
+      if (voitureIds.length === 0) {
+        return [];
       }
+
+      const pannesRef = collection(db, 'pannes');
+      const qPannes = query(pannesRef, where('idVoiture', 'in', voitureIds));
+      const pannesSnapshot = await getDocs(qPannes);
+
+      const pannesAPayer: PanneAPayer[] = [];
+
+      for (const panneDoc of pannesSnapshot.docs) {
+        const panneData = panneDoc.data();
+        const voitureInfo = voituresMap.get(panneData.idVoiture);
+
+        if (!voitureInfo) {
+          continue;
+        }
+
+        // Récupérer le statut le plus récent de la panne
+        const statutsRef = collection(db, 'panneStatuts');
+        const qStatuts = query(
+          statutsRef, 
+          where('idPanne', '==', panneDoc.id)
+        );
+        const statutsSnapshot = await getDocs(qStatuts);
+        
+        let statutLePlusRecent = null;
+        let dateStatutPlusRecent: Date | null = null;
+        
+        statutsSnapshot.forEach((docStatut) => {
+          const statutData = docStatut.data();
+          const dateStatut = statutData.dateHeure?.toDate() || new Date(0);
+          
+          if (!dateStatutPlusRecent || dateStatut > dateStatutPlusRecent) {
+            dateStatutPlusRecent = dateStatut;
+            statutLePlusRecent = statutData.idStatutForPanne;
+          }
+        });
+
+        // ne garder que les pannes avec statut (réparé et non payé)
+        if (statutLePlusRecent !== '2') {
+          continue;
+        }
+
+        const detailsRef = collection(db, 'panneDetails');
+        const qDetails = query(detailsRef, where('idPanne', '==', panneDoc.id));
+        const detailsSnapshot = await getDocs(qDetails);
+
+        const detailsPannes: Array<{ nom: string; prix: number }> = [];
+        let montantTotal = 0;
+
+        for (const detailDoc of detailsSnapshot.docs) {
+          const detailData = detailDoc.data();
+          const panneTypeRef = doc(db, 'panneTypes', detailData.idPanneType);
+          const panneTypeDoc = await getDoc(panneTypeRef);
+          
+          if (panneTypeDoc.exists()) {
+            const panneTypeData = panneTypeDoc.data();
+            detailsPannes.push({
+              nom: panneTypeData.nom,
+              prix: panneTypeData.prix,
+            });
+            montantTotal += panneTypeData.prix;
+          }
+        }
+
+        // montant déjà payé
+        const paiementsRef = collection(db, 'paiements');
+        const qPaiements = query(paiementsRef, where('idPanne', '==', panneDoc.id));
+        const paiementsSnapshot = await getDocs(qPaiements);
+        
+        let montantDejaPaye = 0;
+        paiementsSnapshot.forEach((doc) => {
+          montantDejaPaye += doc.data().montant || 0;
+        });
+
+        const montantRestant = montantTotal - montantDejaPaye;
+
+        // si il reste à payer
+        if (montantRestant > 0) {
+          pannesAPayer.push({
+            id: panneDoc.id,
+            idVoiture: panneData.idVoiture,
+            dateHeure: panneData.dateHeure?.toDate() || new Date(),
+            matriculeVoiture: voitureInfo.matricule,
+            marqueVoiture: voitureInfo.marque,
+            detailsPannes,
+            montantTotal,
+            montantDejaPaye,
+            montantRestant,
+          });
+        }
+      }
+
+      // Trier les pannes par date décroissante
+      pannesAPayer.sort((a, b) => b.dateHeure.getTime() - a.dateHeure.getTime());
+
+      return pannesAPayer;
+    } catch (error) {
+      console.error('Erreur lors de la récupération des pannes à payer:', error);
+      throw error;
     }
-
-    // 9. Trier les pannes par date décroissante (traitement côté client)
-    pannesAPayer.sort((a, b) => b.dateHeure.getTime() - a.dateHeure.getTime());
-
-    return pannesAPayer;
-  } catch (error) {
-    console.error('Erreur lors de la récupération des pannes à payer:', error);
-    throw error;
-  }
-},
-  // Effectuer un paiement
+  },
+  
+  
   effectuerPaiement: async (
     idPanne: string,
     montant: number
@@ -186,7 +181,6 @@ getPannesAPayer: async (): Promise<PanneAPayer[]> => {
       const user = auth.currentUser;
       if (!user) throw new Error('Utilisateur non connecté');
 
-      // 1. Vérifier la panne
       const panneRef = doc(db, 'pannes', idPanne);
       const panneDoc = await getDoc(panneRef);
       
@@ -194,7 +188,6 @@ getPannesAPayer: async (): Promise<PanneAPayer[]> => {
         throw new Error('Panne non trouvée');
       }
 
-      // Vérifier que la voiture appartient à l'utilisateur
       const panneData = panneDoc.data();
       const voitureRef = doc(db, 'voitures', panneData.idVoiture);
       const voitureDoc = await getDoc(voitureRef);
@@ -203,7 +196,6 @@ getPannesAPayer: async (): Promise<PanneAPayer[]> => {
         throw new Error('Cette panne ne vous appartient pas');
       }
 
-      // 2. Calculer le montant total de la panne
       let montantTotal = 0;
       const detailsRef = collection(db, 'panneDetails');
       const qDetails = query(detailsRef, where('idPanne', '==', idPanne));
@@ -219,7 +211,7 @@ getPannesAPayer: async (): Promise<PanneAPayer[]> => {
         }
       }
 
-      // 3. Calculer le montant déjà payé
+      // montant déjà payé
       const paiementsRef = collection(db, 'paiements');
       const qPaiements = query(paiementsRef, where('idPanne', '==', idPanne));
       const paiementsSnapshot = await getDocs(qPaiements);
@@ -231,7 +223,6 @@ getPannesAPayer: async (): Promise<PanneAPayer[]> => {
 
       const montantRestantAvant = montantTotal - montantDejaPaye;
 
-      // 4. Validation du montant
       if (montant <= 0) {
         throw new Error('Le montant doit être positif');
       }
@@ -240,7 +231,6 @@ getPannesAPayer: async (): Promise<PanneAPayer[]> => {
         throw new Error(`Le montant ne peut pas dépasser ${montantRestantAvant} MGA`);
       }
 
-      // 5. Créer le paiement
       const paiement: Omit<Paiement, 'id'> = {
         idPanne,
         montant,
@@ -252,18 +242,17 @@ getPannesAPayer: async (): Promise<PanneAPayer[]> => {
         dateHeure: serverTimestamp(),
       });
 
-      // 6. Calculer le nouveau montant payé
+      // le nouveau montant payé
       const montantTotalPaye = montantDejaPaye + montant;
       const montantRestantApres = montantTotal - montantTotalPaye;
 
-      // 7. Déterminer et créer le statut de paiement
+      // le statut de paiement
       let idStatutForPaiement = '2'; // payé partiel par défaut
       
       if (montantRestantApres === 0) {
         idStatutForPaiement = '3'; // payé complet
         
-        // Mettre à jour le statut de la panne à "payé" (statut 3)
-        // Note: Vous pourriez vouloir créer un nouveau statut panne ici
+        await creerStatutPannePaye(idPanne);
       }
 
       const paiementStatut: Omit<PaiementStatut, 'id'> = {
@@ -339,13 +328,44 @@ getPannesAPayer: async (): Promise<PanneAPayer[]> => {
       return false;
     }
   },
+
+  
 };
+
+async function creerStatutPannePaye(idPanne: string): Promise<{ success: boolean; message: string }> {
+  try {
+    const panneStatut: Omit<PanneStatut, 'id'> = {
+      idPanne,
+      idStatutForPanne: '3', // Statut "payé"
+      dateHeure: new Date(),
+    };
+
+    await addDoc(collection(db, 'panneStatuts'), {
+      ...panneStatut,
+      dateHeure: serverTimestamp(),
+    });
+
+    return { 
+      success: true, 
+      message: 'Statut "payé" créé pour la panne' 
+    };
+  } catch (error: any) {
+    console.error('Erreur création statut panne payé:', error);
+    return { 
+      success: false, 
+      message: error.message || 'Erreur création statut panne'
+    };
+  }
+}
+
+
 
 // Fonction updateDoc manquante
 const updateDoc = async (ref: any, data: any) => {
   // Implémentation de updateDoc si nécessaire
   console.log('Mise à jour du document:', ref, data);
 };
+
 
 // Instance pour l'auto-référence
 const paiementService = {
