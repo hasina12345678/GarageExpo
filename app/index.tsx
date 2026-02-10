@@ -1,29 +1,3 @@
-// import React, { useEffect } from 'react';
-// import { useRouter } from 'expo-router';
-// import { auth } from '../services/firebase';
-
-// export default function IndexPage() {
-// 	const router = useRouter();
-
-// 	useEffect(() => {
-// 		const unsubscribe = auth.onAuthStateChanged(user => {
-
-// 			if (user) {
-// 				router.replace('/pages/Accueil/AccueilPage');
-// 			} else {
-// 				router.replace('/pages/Login/LoginPage');
-// 			}
-
-// 		});
-
-// 		return () => unsubscribe();
-
-// 	}, []);
-
-// 	return null;
-
-// }
-
 import React, { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { auth } from '../services/firebase';
@@ -70,4 +44,5 @@ export default function IndexPage() {
 	};
 
   return null;
+  
 }

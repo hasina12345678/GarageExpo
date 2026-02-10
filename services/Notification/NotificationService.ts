@@ -10,7 +10,6 @@ import {
   getDoc,
   serverTimestamp,
   onSnapshot,
-  // Retirez orderBy, limit de l'import
   deleteDoc
 } from 'firebase/firestore';
 import { sendPushNotification } from './PushNotificationService';
@@ -26,8 +25,35 @@ export interface Notification {
   alreadyPush: boolean;
 }
 
+async function getVoitureInfo(idVoiture: string): Promise<{ matricule: string; marque?: string } | null> {
+  try {
+    const voitureRef = doc(db, 'voitures', idVoiture);
+    const voitureDoc = await getDoc(voitureRef);
+    
+    if (voitureDoc.exists()) {
+      const data = voitureDoc.data();
+      return {
+        matricule: data.matricule || 'Inconnu',
+        marque: data.marque
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error('Erreur récupération info voiture:', error);
+    return null;
+  }
+}
+
+function formaterDatePourNotification(date: Date): string {
+  return date.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
 export default {
-  // 1. Vérifier si une notification existe déjà pour cette panne
   checkNotificationExists: async (idUtilisateur: string, idPanne: string): Promise<boolean> => {
     try {
       const notificationsRef = collection(db, 'notifications');
@@ -44,13 +70,11 @@ export default {
     }
   },
 
-  // 2. Créer une notification pour une panne réparée
-  createReparationNotification: async (idPanne: string): Promise<{ success: boolean; message: string }> => {
+  createReparationNotification: async (idPanne: string, dateStatut: Date): Promise<{ success: boolean; message: string }> => {
     try {
       const user = auth.currentUser;
       if (!user) throw new Error('Utilisateur non connecté');
 
-      // Vérifier que la panne appartient à l'utilisateur
       const panneRef = doc(db, 'pannes', idPanne);
       const panneDoc = await getDoc(panneRef);
       
@@ -59,6 +83,12 @@ export default {
       }
 
       const panneData = panneDoc.data();
+      
+      const voitureInfo = await getVoitureInfo(panneData.idVoiture);
+      if (!voitureInfo) {
+        throw new Error('Voiture non trouvée');
+      }
+
       const voitureRef = doc(db, 'voitures', panneData.idVoiture);
       const voitureDoc = await getDoc(voitureRef);
       
@@ -66,19 +96,20 @@ export default {
         return { success: false, message: 'Cette panne ne vous appartient pas' };
       }
 
-      // Vérifier si notification existe déjà
       const exists = await notificationService.checkNotificationExists(user.uid, idPanne);
       if (exists) {
         return { success: false, message: 'Notification déjà existante' };
       }
 
-      // Créer la notification
+      const titre = `🚗 ${voitureInfo.matricule}${voitureInfo.marque ? ` (${voitureInfo.marque})` : ''} réparé !`;
+      const texte = `Votre véhicule est réparé. Vous pouvez procéder au paiement. Réparé le ${formaterDatePourNotification(dateStatut)}`;
+
       const notification: Omit<Notification, 'id'> = {
         idUtilisateur: user.uid,
         idPanne,
-        titre: '🚗 Panne réparée',
-        texte: 'Votre véhicule est réparé et prêt à être récupéré.',
-        dateHeure: new Date(),
+        titre,
+        texte,
+        dateHeure: dateStatut,
         vue: false,
         alreadyPush: false,
       };
@@ -95,18 +126,15 @@ export default {
     }
   },
 
-  // 3. Récupérer toutes les notifications de l'utilisateur (SANS orderBy)
   getNotifications: async (): Promise<Notification[]> => {
     try {
       const user = auth.currentUser;
       if (!user) return [];
 
       const notificationsRef = collection(db, 'notifications');
-      // RETIREZ orderBy pour éviter l'erreur d'index
       const q = query(
         notificationsRef,
         where('idUtilisateur', '==', user.uid)
-        // RETIRÉ: orderBy('dateHeure', 'desc')
       );
       
       const snapshot = await getDocs(q);
@@ -121,7 +149,6 @@ export default {
         } as Notification);
       });
 
-      // Triez côté client au lieu de Firestore
       return notifications.sort((a, b) => 
         b.dateHeure.getTime() - a.dateHeure.getTime()
       );
@@ -131,41 +158,41 @@ export default {
     }
   },
 
-  // 4. Écouter en temps réel les changements de statut (SANS orderBy)
   setupPanneStatutListener: (callback?: (notification: Notification) => void) => {
     const user = auth.currentUser;
     if (!user) return () => {};
 
     const statutsRef = collection(db, 'panneStatuts');
-    // RETIREZ orderBy pour éviter l'erreur d'index
     const q = query(
       statutsRef,
       where('idStatutForPanne', '==', '2')
-      // RETIRÉ: orderBy('dateHeure', 'desc')
     );
 
     return onSnapshot(q, async (snapshot) => {
       const changes = snapshot.docChanges();
       
-      // Triez les changements par date côté client
       const sortedChanges = changes.sort((a, b) => {
         const dateA = a.doc.data().dateHeure?.toDate() || new Date(0);
         const dateB = b.doc.data().dateHeure?.toDate() || new Date(0);
-        return dateB.getTime() - dateA.getTime(); // Tri décroissant
+        return dateB.getTime() - dateA.getTime();
       });
 
       for (const change of sortedChanges) {
         if (change.type === 'added') {
           const statutData = change.doc.data();
           const idPanne = statutData.idPanne;
+          const dateStatut = statutData.dateHeure?.toDate() || new Date(); 
 
-          // Vérifier que la panne appartient à l'utilisateur
           const panneRef = doc(db, 'pannes', idPanne);
           const panneDoc = await getDoc(panneRef);
           
           if (!panneDoc.exists()) continue;
           
           const panneData = panneDoc.data();
+          
+          const voitureInfo = await getVoitureInfo(panneData.idVoiture);
+          if (!voitureInfo) continue;
+          
           const voitureRef = doc(db, 'voitures', panneData.idVoiture);
           const voitureDoc = await getDoc(voitureRef);
           
@@ -173,17 +200,18 @@ export default {
             continue;
           }
 
-          // Vérifier si notification existe déjà
           const exists = await notificationService.checkNotificationExists(user.uid, idPanne);
           if (exists) continue;
 
-          // Créer la notification
+          const titre = `🚗 ${voitureInfo.matricule}${voitureInfo.marque ? ` (${voitureInfo.marque})` : ''} réparé !`;
+          const texte = `Votre véhicule est réparé. Vous pouvez procéder au paiement. Réparé le ${formaterDatePourNotification(dateStatut)}`;
+
           const notification: Omit<Notification, 'id'> = {
             idUtilisateur: user.uid,
             idPanne,
-            titre: '🚗 Panne réparée !',
-            texte: 'Votre véhicule est réparé. Vous pouvez procéder au paiement.',
-            dateHeure: new Date(),
+            titre,
+            texte,
+            dateHeure: dateStatut,
             vue: false,
             alreadyPush: false,
           };
@@ -198,15 +226,18 @@ export default {
             ...notification,
           };
 
-          // Envoyer la notification push
           try {
             await sendPushNotification(
-              '🚗 Panne réparée !',
-              'Votre véhicule est réparé. Vous pouvez procéder au paiement.',
-              { idPanne, type: 'reparation' }
+              titre, 
+              `Véhicule réparé. Paiement disponible.`,
+              { 
+                idPanne, 
+                type: 'reparation',
+                matricule: voitureInfo.matricule,
+                marque: voitureInfo.marque || ''
+              }
             );
             
-            // Marquer comme push envoyé
             await updateDoc(doc(db, 'notifications', docRef.id), {
               alreadyPush: true,
             });
@@ -214,7 +245,6 @@ export default {
             console.error('Erreur envoi notification push:', error);
           }
 
-          // Appeler le callback si fourni
           if (callback) {
             callback(newNotification as Notification);
           }
@@ -223,7 +253,6 @@ export default {
     });
   },
 
-  // 5. Marquer une notification comme vue
   markAsViewed: async (notificationId: string): Promise<boolean> => {
     try {
       const user = auth.currentUser;
@@ -240,7 +269,6 @@ export default {
     }
   },
 
-  // 6. Marquer toutes les notifications comme vues
   markAllAsViewed: async (): Promise<boolean> => {
     try {
       const user = auth.currentUser;
@@ -259,7 +287,6 @@ export default {
     }
   },
 
-  // 7. Supprimer une notification
   deleteNotification: async (notificationId: string): Promise<boolean> => {
     try {
       await deleteDoc(doc(db, 'notifications', notificationId));
@@ -270,7 +297,6 @@ export default {
     }
   },
 
-  // 8. Supprimer toutes les notifications
   deleteAllNotifications: async (): Promise<boolean> => {
     try {
       const user = auth.currentUser;
@@ -289,13 +315,11 @@ export default {
     }
   },
 
-  // 9. Compter les notifications non lues (version optimisée)
   getUnreadCount: async (): Promise<number> => {
     try {
       const user = auth.currentUser;
       if (!user) return 0;
 
-      // Version simplifiée pour éviter orderBy
       const notificationsRef = collection(db, 'notifications');
       const q = query(notificationsRef, where('idUtilisateur', '==', user.uid));
       const snapshot = await getDocs(q);
@@ -313,7 +337,6 @@ export default {
   },
 };
 
-// Instance pour auto-référence (mise à jour)
 const notificationService = {
   checkNotificationExists: async (idUtilisateur: string, idPanne: string) => {
     const notificationsRef = collection(db, 'notifications');
@@ -329,11 +352,9 @@ const notificationService = {
     const user = auth.currentUser;
     if (!user) return [];
     const notificationsRef = collection(db, 'notifications');
-    // RETIREZ orderBy
     const q = query(
       notificationsRef,
       where('idUtilisateur', '==', user.uid)
-      // RETIRÉ: orderBy('dateHeure', 'desc')
     );
     const snapshot = await getDocs(q);
     const notifications = snapshot.docs.map(doc => ({
@@ -342,7 +363,6 @@ const notificationService = {
       dateHeure: doc.data().dateHeure?.toDate() || new Date(),
     })) as Notification[];
     
-    // Triez côté client
     return notifications.sort((a, b) => 
       b.dateHeure.getTime() - a.dateHeure.getTime()
     );

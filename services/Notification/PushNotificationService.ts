@@ -1,16 +1,14 @@
-// services/Notification/PushNotificationService.ts
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { Alert } from 'react-native';
 
-// Fonction pour vérifier si on est en Expo Go
 export function isExpoGo() {
   return Constants.appOwnership === 'expo';
 }
 
-// 1. Demander les permissions push (version compatible Expo Go)
+// 1. Demander les permissions push
 export async function registerForPushNotificationsAsync() {
   if (!Device.isDevice) {
     console.log('Les notifications ne fonctionnent pas sur un simulateur');
@@ -22,7 +20,7 @@ export async function registerForPushNotificationsAsync() {
     console.log('Mode Expo Go: notifications push désactivées');
     Alert.alert(
       'Notifications',
-      'Les notifications push nécessitent une build de développement. Utilisez "npx expo run:android" pour les tester.'
+      'Les notifications push nécessitent une build de développement.'
     );
     return null;
   }
@@ -40,7 +38,6 @@ export async function registerForPushNotificationsAsync() {
     return null;
   }
 
-  // Récupérer le token push
   const token = (await Notifications.getExpoPushTokenAsync({
     projectId: Constants.expoConfig?.extra?.eas?.projectId,
   })).data;
@@ -49,9 +46,8 @@ export async function registerForPushNotificationsAsync() {
   return token;
 }
 
-// 2. Configurer les canaux (Android)
 export async function setupNotificationChannels() {
-  // Même en Expo Go, on peut configurer les canaux pour les notifications locales
+  
   if (Platform.OS === 'android') {
     try {
       await Notifications.setNotificationChannelAsync('default', {
@@ -67,11 +63,9 @@ export async function setupNotificationChannels() {
   }
 }
 
-// 3. Envoyer une notification push (version compatible)
+// 3. Envoyer une notification push 
 export async function sendPushNotification(title: string, body: string, data?: any) {
-  // En Expo Go, on utilise les notifications locales
   if (isExpoGo()) {
-    // Notification locale (fonctionne dans Expo Go)
     await Notifications.scheduleNotificationAsync({
       content: {
         title,
@@ -83,7 +77,6 @@ export async function sendPushNotification(title: string, body: string, data?: a
       trigger: null,
     });
   } else {
-    // Version complète pour les builds de développement
     await Notifications.scheduleNotificationAsync({
       content: {
         title,
@@ -98,14 +91,12 @@ export async function sendPushNotification(title: string, body: string, data?: a
   }
 }
 
-// 4. Réinitialiser le badge
 export async function resetNotificationBadge() {
   if (!isExpoGo()) {
     await Notifications.setBadgeCountAsync(0);
   }
 }
 
-// 5. Obtenir le nombre actuel de badges
 export async function getBadgeCount() {
   if (!isExpoGo()) {
     return await Notifications.getBadgeCountAsync();

@@ -1,4 +1,3 @@
-// components/NotificationListener.tsx
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import { setupNotificationChannels } from '../services/Notification/PushNotificationService';
