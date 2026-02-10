@@ -17,7 +17,9 @@ export default function IndexPage() {
 				setupNotificationHandlers();
 				
 				router.replace('/pages/Accueil/AccueilPage');
+				// router.replace('./splash');
 			} else {
+				// router.replace('./splash');
 				router.replace('/pages/Login/LoginPage');
 			}
 		});

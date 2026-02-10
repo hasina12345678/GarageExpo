@@ -194,7 +194,7 @@ export default function NotificationPage() {
 		return (
 		<View style={[NotificationStyles.loadingContainer, { flex: 1 }]}>
 			<ActivityIndicator size="large" color="#4299E1" />
-			<Text style={NotificationStyles.loadingText}>Chargement des notifications...</Text>
+			<Text style={NotificationStyles.loadingText}></Text>
 		</View>
 		);
 	}
