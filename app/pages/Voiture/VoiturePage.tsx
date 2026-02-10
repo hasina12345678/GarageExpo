@@ -204,11 +204,10 @@ export default function VoiturePage() {
 								{/* Informations de la voiture */}
 								<View style={VoitureStyles.infoContainer}>
 									{(voiture.marque || voiture.modele) && (
-										<View style={VoitureStyles.infoRow}>
-											<Icon name="directions-car" size={20} style={VoitureStyles.infoIcon} />
-											<Text style={VoitureStyles.infoLabel}>Véhicule</Text>
-											<Text style={VoitureStyles.infoValue}>{voiture.marque || 'Non spécifié'}{voiture.modele ? `-${voiture.modele}` : ''}</Text>
-										</View>
+										<Text style={VoitureStyles.infoValue}>
+											{voiture.marque || 'Non spécifié'}
+											{voiture.modele && `-${voiture.modele}`}
+										</Text>
 									)}
 									
 									{voiture.annee && (
