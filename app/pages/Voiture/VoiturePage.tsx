@@ -152,12 +152,8 @@ export default function VoiturePage() {
 			>
 				{/* Header */}
 				<View style={VoitureStyles.headerContainer}>
-					<Text style={VoitureStyles.headerTitle}>
-						Mes véhicules
-					</Text>
-					<Text style={VoitureStyles.headerSubtitle}>
-						Gérez vos véhicules enregistrés et suivez leur historique de maintenance
-					</Text>
+					<Text style={VoitureStyles.headerTitle}>Mes véhicules</Text>
+					<Text style={VoitureStyles.headerSubtitle}>Gérez vos véhicules enregistrés et suivez leur historique de maintenance</Text>
 				</View>
 				
 				{/* Bouton ajouter */}
@@ -211,9 +207,7 @@ export default function VoiturePage() {
 										<View style={VoitureStyles.infoRow}>
 											<Icon name="directions-car" size={20} style={VoitureStyles.infoIcon} />
 											<Text style={VoitureStyles.infoLabel}>Véhicule</Text>
-											<Text style={VoitureStyles.infoValue}>
-												{voiture.marque || 'Non spécifié'} {voiture.modele ? `- ${voiture.modele}` : ''}
-											</Text>
+											<Text style={VoitureStyles.infoValue}>{voiture.marque || 'Non spécifié'}{voiture.modele ? `-${voiture.modele}` : ''}</Text>
 										</View>
 									)}
 									
@@ -356,11 +350,13 @@ export default function VoiturePage() {
 					</Text>
 					
 					<Text style={VoitureStyles.confirmationMessage}>
-						Êtes-vous sûr de vouloir supprimer le véhicule {' '}
-						<Text style={{ fontWeight: 'bold' }}>
-							{selectedVoiture ? getFormattedMatricule(selectedVoiture.matricule) : ''}
-						</Text>
-						{' '}? Cette action est irréversible.
+						Êtes-vous sûr de vouloir supprimer le véhicule
+						{selectedVoiture && (
+							<Text style={{ fontWeight: 'bold' }}>
+								{' '}{getFormattedMatricule(selectedVoiture.matricule)}{' '}
+							</Text>
+						)}
+						? Cette action est irréversible.
 					</Text>
 					
 					<View style={VoitureStyles.buttonRow}>

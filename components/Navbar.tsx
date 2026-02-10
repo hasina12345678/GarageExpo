@@ -88,7 +88,7 @@ export default function Navbar() {
 			icon: 'palette', 
 			label: 'Thème', 
 			action: () => {
-				console.log('Changer thème');
+				router.push('/pages/Theme/ThemePage');
 				setShowSettings(false);
 			}
 		},
@@ -101,18 +101,10 @@ export default function Navbar() {
 			}
 		},
 		{ 
-			icon: 'tune',
-			label: 'Paramètres', 
+			icon: 'school', 
+			label: 'Équipe ETU', 
 			action: () => {
-				console.log('Ouvrir paramètres');
-				setShowSettings(false);
-			}
-		},
-		{ 
-			icon: 'help-outline', 
-			label: 'Aide & Support', 
-			action: () => {
-				console.log('Ouvrir aide');
+				router.push('/pages/ETU/ETUPage');
 				setShowSettings(false);
 			}
 		},

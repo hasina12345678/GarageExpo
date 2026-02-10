@@ -8,7 +8,7 @@ export default function RootLayout() {
 	
 	const routeName = segments[segments.length - 1] || '';
 	
-	const noNavbarPages = ['LoginPage', 'InscriptionPage', 'ProfilPage', 'index'];
+	const noNavbarPages = ['LoginPage', 'InscriptionPage', 'ProfilPage', 'ETUPage', 'ThemePage', 'index'];
 	
 	const showNavbar = !noNavbarPages.includes(routeName);
 

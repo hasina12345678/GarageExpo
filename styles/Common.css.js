@@ -1,11 +1,15 @@
 // styles/Common.css.js
 import { Dimensions } from 'react-native';
-import { Platform } from 'react-native'; // AJOUTER Platform
+import { Platform } from 'react-native';
+import themeService from '../services/Theme/ThemeService';
 
 const { width, height } = Dimensions.get('window');
 
-export const Colors = {
-  // Couleurs professionnelles - palette moderne
+// Récupérer les couleurs dynamiques du thème actuel
+export const getColors = () => themeService.getColors();
+
+// Les couleurs par défaut (thème light) pour compatibilité
+export const defaultColors = {
   primary: '#FFFFFF',
   secondary: '#F8F9FA',
   accent: '#4A5568',
@@ -29,6 +33,9 @@ export const Colors = {
   danger: '#E53E3E',
   info: '#4299E1',
 };
+
+// Fonction pour obtenir dynamiquement les couleurs
+export const Colors = getColors();
 
 export const Fonts = {
   h1: Math.min(width * 0.09, 32),
@@ -70,60 +77,75 @@ export const Layout = {
   wrap: { flexWrap: 'wrap' },
   absoluteFill: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
 };
-export const Shadows = {
-  subtle: {
-    shadowColor: Colors.gray700,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  medium: {
-    shadowColor: Colors.gray700,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  strong: {
-    shadowColor: Colors.gray700,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-  },
+
+// Fonction pour obtenir les shadows dynamiquement
+export const getShadows = () => {
+  const colors = getColors();
+  return {
+    subtle: {
+      shadowColor: colors.gray700,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 1,
+    },
+    medium: {
+      shadowColor: colors.gray700,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    strong: {
+      shadowColor: colors.gray700,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 5,
+    },
+  };
 };
 
-export const Components = {
-  button: {
-    backgroundColor: Colors.blue,
-    paddingVertical: Sizes.md,
-    paddingHorizontal: Sizes.lg,
-    borderRadius: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonText: {
-    color: Colors.white,
-    fontSize: Fonts.body,
-    fontWeight: '600',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: Colors.gray300,
-    backgroundColor: Colors.white,
-    borderRadius: 6,
-    paddingVertical: Sizes.sm,
-    paddingHorizontal: Sizes.md,
-    fontSize: Fonts.body,
-    color: Colors.gray700,
-  },
-  card: {
-    backgroundColor: Colors.white,
-    borderRadius: 8,
-    padding: Sizes.lg,
-    ...Shadows.subtle,
-  },
+export const Shadows = getShadows();
+
+// Fonction pour obtenir les components dynamiquement
+export const getComponents = () => {
+  const colors = getColors();
+  const currentShadows = getShadows();
+  
+  return {
+    button: {
+      backgroundColor: colors.blue,
+      paddingVertical: Sizes.md,
+      paddingHorizontal: Sizes.lg,
+      borderRadius: 6,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    buttonText: {
+      color: colors.white,
+      fontSize: Fonts.body,
+      fontWeight: '600',
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: colors.gray300,
+      backgroundColor: colors.white,
+      borderRadius: 6,
+      paddingVertical: Sizes.sm,
+      paddingHorizontal: Sizes.md,
+      fontSize: Fonts.body,
+      color: colors.gray700,
+    },
+    card: {
+      backgroundColor: colors.card || colors.white,
+      borderRadius: 8,
+      padding: Sizes.lg,
+      ...currentShadows.subtle,
+    },
+  };
 };
+
+export const Components = getComponents();
 
 export { Platform };
