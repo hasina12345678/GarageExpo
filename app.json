@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Garage",
-    "slug": "Garage",
+    "slug": "garage",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
@@ -46,8 +46,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "cad30c6a-606c-47f7-ab18-a3f854b52a97"
+        "projectId": "c97dd0f8-5d0e-4bbb-b414-80dce0b48e63"
       }
-    }
+    },
+    "owner": "hasinazr"
   }
 }
