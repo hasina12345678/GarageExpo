@@ -1,209 +1,177 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, Easing, StyleSheet } from 'react-native';
+import {
+  View,
+  Animated,
+  Easing,
+  Image,
+  StyleSheet,
+  Text
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { auth } from '../services/firebase';
+import * as SplashScreen from 'expo-splash-screen';
 
-export default function SplashScreen() {
+SplashScreen.preventAutoHideAsync();
+
+export default function SplashPage() {
   const router = useRouter();
-  
-  // Animations
-  const spinValue = useRef(new Animated.Value(0)).current;
-  const fadeValue = useRef(new Animated.Value(0)).current;
-  const scaleValue = useRef(new Animated.Value(0.5)).current;
+  const rotation = useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(1)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Animation d'apparition
+   
     Animated.parallel([
-      Animated.timing(fadeValue, {
+      Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 800,
         useNativeDriver: true,
       }),
-      Animated.timing(scaleValue, {
-        toValue: 1,
-        duration: 800,
-        easing: Easing.elastic(1),
+      Animated.timing(scale, {
+        toValue: 1.1,
+        duration: 1000,
+        easing: Easing.inOut(Easing.ease),
         useNativeDriver: true,
       }),
     ]).start();
 
-    // Animation de rotation continue
     Animated.loop(
-      Animated.timing(spinValue, {
+      Animated.timing(rotation, {
         toValue: 1,
-        duration: 2000,
+        duration: 3000,
         easing: Easing.linear,
         useNativeDriver: true,
       })
     ).start();
 
-    // Redirection après 3 secondes
     const timer = setTimeout(() => {
-      const user = auth.currentUser;
-      if (user) {
-        router.replace('/pages/Accueil/AccueilPage');
-      } else {
-        router.replace('/pages/Login/LoginPage');
-      }
-    }, 3000);
+      checkAuthentication();
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, []);
 
-  const spin = spinValue.interpolate({
+  const checkAuthentication = async () => {
+    try {
+      
+      await SplashScreen.hideAsync();
+      
+      auth.onAuthStateChanged((user) => {
+       
+        Animated.parallel([
+          Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scale, {
+            toValue: 0.8,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
+          
+          if (user) {
+            router.replace('/pages/Accueil/AccueilPage');
+          } else {
+            router.replace('/pages/Login/LoginPage');
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Erreur lors du splash:', error);
+      
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          router.replace('/pages/Accueil/AccueilPage');
+        } else {
+          router.replace('/pages/Login/LoginPage');
+        }
+      });
+    }
+  };
+
+  const rotateInterpolate = rotation.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
   });
 
   return (
-    <View style={styles.container}>
-     
-      <Animated.View 
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+      <Animated.View
         style={[
-          styles.tireContainer,
-          { 
-            opacity: fadeValue,
+          styles.logoContainer,
+          {
             transform: [
-              { scale: scaleValue },
-              { rotate: spin }
+              { rotate: rotateInterpolate },
+              { scale: scale }
             ]
           }
         ]}
       >
-        <View style={styles.tire}>
-          
-          <View style={styles.spoke} />
-          <View style={[styles.spoke, styles.spoke45]} />
-          <View style={[styles.spoke, styles.spoke90]} />
-          <View style={[styles.spoke, styles.spoke135]} />
-          
-          <View style={styles.hub}>
-            <View style={styles.hubCenter} />
-          </View>
-        </View>
+        <Image
+          source={require('../assets/images/logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
       </Animated.View>
-
-      <Animated.View style={{ opacity: fadeValue }}>
-        <Text style={styles.title}>MyGarage</Text>
-        <Text style={styles.subtitle}>Préparation en cours...</Text>
-      </Animated.View>
-
-      <View style={styles.dotsContainer}>
-        {[0, 1, 2].map((index) => {
-          const dotAnim = useRef(new Animated.Value(0)).current;
-          
-          useEffect(() => {
-            Animated.loop(
-              Animated.sequence([
-                Animated.timing(dotAnim, {
-                  toValue: 1,
-                  duration: 600,
-                  delay: index * 200,
-                  useNativeDriver: true,
-                }),
-                Animated.timing(dotAnim, {
-                  toValue: 0,
-                  duration: 600,
-                  useNativeDriver: true,
-                }),
-              ])
-            ).start();
-          }, []);
-
-          const opacity = dotAnim.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0.3, 1],
-          });
-
-          const scale = dotAnim.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0.8, 1.2],
-          });
-
-          return (
-            <Animated.View
-              key={index}
-              style={[
-                styles.dot,
-                {
-                  opacity,
-                  transform: [{ scale }],
-                },
-              ]}
-            />
-          );
-        })}
+      
+      <Animated.Text style={[styles.title, { opacity: fadeAnim }]}>
+        GarageApp
+      </Animated.Text>
+      <Animated.Text style={[styles.subtitle, { opacity: fadeAnim }]}>
+        Votre partenaire automobile
+      </Animated.Text>
+      
+      <View style={styles.loadingContainer}>
+        <View style={styles.loadingDot} />
+        <View style={[styles.loadingDot, styles.loadingDotMiddle]} />
+        <View style={styles.loadingDot} />
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#E6F4FE',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
-  tireContainer: {
-    marginBottom: 40,
+  logoContainer: {
+    marginBottom: 20,
   },
-  tire: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#2D3748',
-    borderWidth: 8,
-    borderColor: '#4A5568',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  spoke: {
-    position: 'absolute',
-    width: 2,
-    height: 100,
-    backgroundColor: '#CBD5E0',
-    opacity: 0.6,
-  },
-  spoke45: { transform: [{ rotate: '45deg' }] },
-  spoke90: { transform: [{ rotate: '90deg' }] },
-  spoke135: { transform: [{ rotate: '135deg' }] },
-  hub: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#4299E1',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  hubCenter: {
-    width: 15,
-    height: 15,
-    borderRadius: 7.5,
-    backgroundColor: '#FFFFFF',
+  logo: {
+    width: 150,
+    height: 150,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#2D3748',
+    color: '#2196F3',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#718096',
-    textAlign: 'center',
+    color: '#666',
+    marginBottom: 40,
   },
-  dotsContainer: {
+  loadingContainer: {
     flexDirection: 'row',
-    marginTop: 40,
+    alignItems: 'center',
+    marginTop: 20,
   },
-  dot: {
+  loadingDot: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#4299E1',
-    marginHorizontal: 6,
+    backgroundColor: '#2196F3',
+    marginHorizontal: 4,
+  },
+  loadingDotMiddle: {
+    backgroundColor: '#1976D2',
+    transform: [{ scale: 1.2 }],
   },
 });
