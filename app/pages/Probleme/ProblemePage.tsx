@@ -211,39 +211,59 @@ export default function ProblemePage() {
 						1. Sélectionnez votre véhicule
 					</Text>
 					
-					<TouchableOpacity
-						style={ProblemeStyles.voitureSelector}
-						onPress={() => {
-						Alert.alert(
-							'Sélectionner une voiture',
-							'Choisissez un véhicule',
-							voitures.map(voiture => ({
-							text: `${formaterMatricule(voiture.matricule)} ${voiture.marque ? `- ${voiture.marque}` : ''}`,
-							onPress: () => setSelectedVoiture(voiture),
-							}))
-						);
-						}}
-						activeOpacity={0.7}
-					>
-						{selectedVoiture ? (
-						<>
-							<Text style={ProblemeStyles.voitureSelectorValue}>
-								{formaterMatricule(selectedVoiture.matricule)}
-								{selectedVoiture.marque && ` - ${selectedVoiture.marque}`}
-								{selectedVoiture.modele && ` ${selectedVoiture.modele}`}
+					{/* Affichage de la voiture sélectionnée */}
+					{selectedVoiture && (
+						<View style={ProblemeStyles.selectedVoitureContainer}>
+						<Icon name="directions-car" size={24} color={Colors.blue} />
+						<View style={ProblemeStyles.selectedVoitureInfo}>
+							<Text style={ProblemeStyles.selectedVoitureMatricule}>
+							{formaterMatricule(selectedVoiture.matricule)}
 							</Text>
-							<View style={ProblemeStyles.voitureInfo}>
-								<Text style={ProblemeStyles.voitureText}>
-									Matricule: {formaterMatricule(selectedVoiture.matricule)}
-								</Text>
-							</View>
-						</>
-						) : (
-						<Text style={ProblemeStyles.voitureSelectorPlaceholder}>
-							Sélectionnez une voiture...
-						</Text>
-						)}
-					</TouchableOpacity>
+							<Text style={ProblemeStyles.selectedVoitureDetails}>
+							{selectedVoiture.marque} {selectedVoiture.modele && `- ${selectedVoiture.modele}`}
+							</Text>
+						</View>
+						</View>
+					)}
+					
+					{/* Liste horizontale des voitures */}
+					<ScrollView 
+						horizontal 
+						showsHorizontalScrollIndicator={false}
+						style={ProblemeStyles.voitureScrollContainer}
+						contentContainerStyle={ProblemeStyles.voitureScrollContent}
+					>
+						{voitures.map((voiture) => (
+						<TouchableOpacity
+							key={voiture.id}
+							style={[
+							ProblemeStyles.voitureCard,
+							selectedVoiture?.id === voiture.id && ProblemeStyles.voitureCardSelected
+							]}
+							onPress={() => setSelectedVoiture(voiture)}
+						>
+							<Icon 
+							name="directions-car" 
+							size={20} 
+							color={selectedVoiture?.id === voiture.id ? Colors.white : Colors.gray600} 
+							/>
+							<Text style={[
+							ProblemeStyles.voitureCardMatricule,
+							selectedVoiture?.id === voiture.id && ProblemeStyles.voitureCardTextSelected
+							]}>
+							{formaterMatricule(voiture.matricule)}
+							</Text>
+							{voiture.marque && (
+							<Text style={[
+								ProblemeStyles.voitureCardMarque,
+								selectedVoiture?.id === voiture.id && ProblemeStyles.voitureCardTextSelected
+							]}>
+								{voiture.marque}
+							</Text>
+							)}
+						</TouchableOpacity>
+						))}
+					</ScrollView>
 				</View>
 				
 				{/* Sélection des types de panne */}
