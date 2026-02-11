@@ -27,54 +27,76 @@ export default function SplashPage() {
   const rotation = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(1)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const dotAnimation = useRef(new Animated.Value(0)).current;
+  const dot1Anim = useRef(new Animated.Value(0)).current;
+  const dot2Anim = useRef(new Animated.Value(0)).current;
+  const dot3Anim = useRef(new Animated.Value(0)).current;
+  
   const [isCheckingAuth, setIsCheckingAuth] = React.useState(false);
 
   useEffect(() => {
-    // Animation d'entrée
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scale, {
-        toValue: 1.1,
-        duration: 1000,
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: true,
-      }),
-    ]).start();
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 800,
+      useNativeDriver: true,
+    }).start();
 
-    // Animation de rotation du logo
-    Animated.loop(
-      Animated.timing(rotation, {
-        toValue: 1,
-        duration: 3000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    ).start();
-
-    // Animation des points
+    // Point 1
     Animated.loop(
       Animated.sequence([
-        Animated.timing(dotAnimation, {
+        Animated.delay(0),
+        Animated.timing(dot1Anim, {
           toValue: 1,
-          duration: 600,
+          duration: 400,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
-        Animated.timing(dotAnimation, {
+        Animated.timing(dot1Anim, {
           toValue: 0,
-          duration: 600,
+          duration: 400,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
       ])
     ).start();
 
-    // Vérifier l'authentification après 2 secondes
+    // Point 2
+    Animated.loop(
+      Animated.sequence([
+        Animated.delay(200),
+        Animated.timing(dot2Anim, {
+          toValue: 1,
+          duration: 400,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(dot2Anim, {
+          toValue: 0,
+          duration: 400,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    // Point 3
+    Animated.loop(
+      Animated.sequence([
+        Animated.delay(400), 
+        Animated.timing(dot3Anim, {
+          toValue: 1,
+          duration: 400,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(dot3Anim, {
+          toValue: 0,
+          duration: 400,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
     const timer = setTimeout(() => {
       checkAuthentication();
     }, 2000);
@@ -85,22 +107,12 @@ export default function SplashPage() {
   const checkAuthentication = () => {
     setIsCheckingAuth(true);
     
-    // Écouter l'état d'authentification
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      // Animation de sortie
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scale, {
-          toValue: 0.8,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        // Redirection après l'animation de sortie
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(() => {
         if (user) {
           router.replace('/pages/Accueil/AccueilPage');
         } else {
@@ -111,14 +123,34 @@ export default function SplashPage() {
     });
   };
 
-  const rotateInterpolate = rotation.interpolate({
+  const dot1Scale = dot1Anim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
+    outputRange: [1, 1.4],
   });
 
-  const dotScale = dotAnimation.interpolate({
+  const dot2Scale = dot2Anim.interpolate({
     inputRange: [0, 1],
-    outputRange: [1, 1.3],
+    outputRange: [1, 1.4],
+  });
+
+  const dot3Scale = dot3Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.4],
+  });
+
+  const dot1Opacity = dot1Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.6, 1],
+  });
+
+  const dot2Opacity = dot2Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.6, 1],
+  });
+
+  const dot3Opacity = dot3Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.6, 1],
   });
 
   return (
@@ -127,49 +159,39 @@ export default function SplashPage() {
         styles.content,
         {
           opacity: fadeAnim,
-          transform: [{ scale: scale }]
         }
       ]}>
-		<Animated.View style={[
-		styles.logoContainer,
-		{
-			transform: [{ scale: scale }]
-		}
-		]}>
-		<Image
-			source={require('../assets/images/logo.png')}
-			style={styles.logo}
-			resizeMode="contain"
-		/>
-		</Animated.View>
-        
-        <Text style={styles.title}>
-          Garage
-        </Text>
-        <Text style={styles.subtitle}>
-          Votre partenaire automobile
-        </Text>
         
         <View style={styles.loadingContainer}>
-          <Animated.View style={[styles.loadingDot, { transform: [{ scale: dotScale }] }]} />
-          <Animated.View style={[
-            styles.loadingDot, 
-            styles.loadingDotMiddle, 
-            { 
-              transform: [{ scale: dotAnimation.interpolate({
-                inputRange: [0, 1],
-                outputRange: [1.2, 1.5]
-              })}] 
-            }
-          ]} />
-          <Animated.View style={[styles.loadingDot, { transform: [{ scale: dotScale }] }]} />
+          <Animated.View 
+            style={[
+              styles.loadingDot, 
+              { 
+                transform: [{ scale: dot1Scale }],
+                opacity: dot1Opacity
+              }
+            ]} 
+          />
+          <Animated.View 
+            style={[
+              styles.loadingDot, 
+              styles.loadingDotMiddle,
+              { 
+                transform: [{ scale: dot2Scale }],
+                opacity: dot2Opacity
+              }
+            ]} 
+          />
+          <Animated.View 
+            style={[
+              styles.loadingDot, 
+              { 
+                transform: [{ scale: dot3Scale }],
+                opacity: dot3Opacity
+              }
+            ]} 
+          />
         </View>
-        
-        {isCheckingAuth && (
-          <Text style={styles.checkingText}>
-            Vérification...
-          </Text>
-        )}
       </Animated.View>
     </View>
   );
@@ -186,25 +208,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
-  logoContainer: {
-    width: 150,
-    height: 150,
-    marginBottom: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    // Effets visuels optionnels
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  logo: {
-    width: '100%',
-    height: '100%',
-    // Optionnel: appliquer une teinte orange si votre logo est d'une autre couleur
-    // tintColor: COLORS.primary,
-  },
   title: {
     fontSize: 36,
     fontWeight: 'bold',
@@ -217,12 +220,14 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: COLORS.accent,
-    marginBottom: 40,
+    marginBottom: 60, 
   },
   loadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 40,
+    justifyContent: 'center',
+    height: 50,
+    marginTop: 20,
     marginBottom: 20,
   },
   loadingDot: {
@@ -230,7 +235,7 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
     backgroundColor: COLORS.secondary,
-    marginHorizontal: 6,
+    marginHorizontal: 8, 
   },
   loadingDotMiddle: {
     backgroundColor: COLORS.primary,
@@ -238,6 +243,6 @@ const styles = StyleSheet.create({
   checkingText: {
     fontSize: 14,
     color: COLORS.accentLight,
-    marginTop: 10,
+    marginTop: 20,
   },
 });
