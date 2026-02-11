@@ -373,6 +373,70 @@ const ProblemeStyles = StyleSheet.create({
     fontSize: Fonts.small,
     textAlign: 'center',
   },
+
+  // Voiture sélectionnée (affichage principal)
+selectedVoitureContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: Colors.gray50,
+  borderRadius: 8,
+  padding: Sizes.md,
+  marginBottom: Sizes.md,
+},
+selectedVoitureInfo: {
+  marginLeft: Sizes.md,
+  flex: 1,
+},
+selectedVoitureMatricule: {
+  fontSize: Fonts.body,
+  fontWeight: '600',
+  color: Colors.gray800,
+  marginBottom: 2,
+},
+selectedVoitureDetails: {
+  fontSize: Fonts.small,
+  color: Colors.gray600,
+},
+
+// Scroll horizontal des voitures
+voitureScrollContainer: {
+  marginHorizontal: -Sizes.xs,
+},
+voitureScrollContent: {
+  paddingHorizontal: Sizes.xs,
+},
+voitureCard: {
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: Colors.white,
+  borderWidth: 1,
+  borderColor: Colors.gray300,
+  borderRadius: 8,
+  padding: Sizes.md,
+  marginHorizontal: Sizes.xs,
+  minWidth: 100,
+  height: 100,
+},
+voitureCardSelected: {
+  backgroundColor: Colors.blue,
+  borderColor: Colors.blue,
+},
+voitureCardMatricule: {
+  fontSize: Fonts.small,
+  fontWeight: '600',
+  color: Colors.gray800,
+  marginTop: Sizes.xs,
+  textAlign: 'center',
+},
+voitureCardMarque: {
+  fontSize: Fonts.xsmall,
+  color: Colors.gray600,
+  textAlign: 'center',
+},
+voitureCardTextSelected: {
+  color: Colors.white,
+},
+
 });
 
 export default ProblemeStyles;
