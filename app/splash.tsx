@@ -3,18 +3,13 @@ import {
   View,
   Animated,
   Easing,
-  Image,
   StyleSheet,
-  Text
+  Text,
+  Image
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { auth } from '../services/firebase';
-import * as SplashScreen from 'expo-splash-screen';
 
-// Empêche le splash screen natif de se cacher automatiquement
-SplashScreen.preventAutoHideAsync();
-
-// Couleurs de votre thème
 const COLORS = {
   primary: '#F7931e',
   secondary: '#F9A742',
@@ -22,9 +17,9 @@ const COLORS = {
   accentLight: '#718096',
   border: '#E0E0E0',
   surface: '#FFFFFF',
-  blue: '#F7931e', // orange dans votre thème
+  blue: '#F7931e', 
   blueDark: '#D47A1A',
-  background: '#FEF9F3', // Fond plus clair pour aller avec l'orange
+  background: '#FEF9F3',
 };
 
 export default function SplashPage() {
@@ -33,9 +28,10 @@ export default function SplashPage() {
   const scale = useRef(new Animated.Value(1)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const dotAnimation = useRef(new Animated.Value(0)).current;
+  const [isCheckingAuth, setIsCheckingAuth] = React.useState(false);
 
   useEffect(() => {
-    // Démarrer l'animation d'entrée
+    // Animation d'entrée
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -50,7 +46,7 @@ export default function SplashPage() {
       }),
     ]).start();
 
-    // Animation de rotation continue
+    // Animation de rotation du logo
     Animated.loop(
       Animated.timing(rotation, {
         toValue: 1,
@@ -60,7 +56,7 @@ export default function SplashPage() {
       })
     ).start();
 
-    // Animation des points de chargement
+    // Animation des points
     Animated.loop(
       Animated.sequence([
         Animated.timing(dotAnimation, {
@@ -78,49 +74,41 @@ export default function SplashPage() {
       ])
     ).start();
 
-    // Vérifier l'authentification après un délai
+    // Vérifier l'authentification après 2 secondes
     const timer = setTimeout(() => {
       checkAuthentication();
-    }, 2500);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
 
-  const checkAuthentication = async () => {
-    try {
-      await SplashScreen.hideAsync();
-      
-      auth.onAuthStateChanged((user) => {
-        // Animation de sortie
-        Animated.parallel([
-          Animated.timing(fadeAnim, {
-            toValue: 0,
-            duration: 500,
-            useNativeDriver: true,
-          }),
-          Animated.timing(scale, {
-            toValue: 0.8,
-            duration: 500,
-            useNativeDriver: true,
-          }),
-        ]).start(() => {
-          if (user) {
-            router.replace('/pages/Accueil/AccueilPage');
-          } else {
-            router.replace('/pages/Login/LoginPage');
-          }
-        });
-      });
-    } catch (error) {
-      console.error('Erreur lors du splash:', error);
-      auth.onAuthStateChanged((user) => {
+  const checkAuthentication = () => {
+    setIsCheckingAuth(true);
+    
+    // Écouter l'état d'authentification
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      // Animation de sortie
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scale, {
+          toValue: 0.8,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        // Redirection après l'animation de sortie
         if (user) {
           router.replace('/pages/Accueil/AccueilPage');
         } else {
           router.replace('/pages/Login/LoginPage');
         }
+        unsubscribe();
       });
-    }
+    });
   };
 
   const rotateInterpolate = rotation.interpolate({
@@ -128,55 +116,62 @@ export default function SplashPage() {
     outputRange: ['0deg', '360deg'],
   });
 
-  // Interpolation pour l'animation des points
   const dotScale = dotAnimation.interpolate({
     inputRange: [0, 1],
     outputRange: [1, 1.3],
   });
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-      <Animated.View
-        style={[
-          styles.logoContainer,
-          {
-            transform: [
-              { rotate: rotateInterpolate },
-              { scale: scale }
-            ]
-          }
-        ]}
-      >
-        <Image
-          source={require('../../assets/images/logo.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+    <View style={styles.container}>
+      <Animated.View style={[
+        styles.content,
+        {
+          opacity: fadeAnim,
+          transform: [{ scale: scale }]
+        }
+      ]}>
+		<Animated.View style={[
+		styles.logoContainer,
+		{
+			transform: [{ scale: scale }]
+		}
+		]}>
+		<Image
+			source={require('../assets/images/logo.png')}
+			style={styles.logo}
+			resizeMode="contain"
+		/>
+		</Animated.View>
+        
+        <Text style={styles.title}>
+          Garage
+        </Text>
+        <Text style={styles.subtitle}>
+          Votre partenaire automobile
+        </Text>
+        
+        <View style={styles.loadingContainer}>
+          <Animated.View style={[styles.loadingDot, { transform: [{ scale: dotScale }] }]} />
+          <Animated.View style={[
+            styles.loadingDot, 
+            styles.loadingDotMiddle, 
+            { 
+              transform: [{ scale: dotAnimation.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1.2, 1.5]
+              })}] 
+            }
+          ]} />
+          <Animated.View style={[styles.loadingDot, { transform: [{ scale: dotScale }] }]} />
+        </View>
+        
+        {isCheckingAuth && (
+          <Text style={styles.checkingText}>
+            Vérification...
+          </Text>
+        )}
       </Animated.View>
-      
-      <Animated.Text style={[styles.title, { opacity: fadeAnim }]}>
-        GarageApp
-      </Animated.Text>
-      <Animated.Text style={[styles.subtitle, { opacity: fadeAnim }]}>
-        Votre partenaire automobile
-      </Animated.Text>
-      
-      {/* Indicateur de chargement avec animation */}
-      <View style={styles.loadingContainer}>
-        <Animated.View style={[styles.loadingDot, { transform: [{ scale: dotScale }] }]} />
-        <Animated.View style={[
-          styles.loadingDot, 
-          styles.loadingDotMiddle, 
-          { 
-            transform: [{ scale: dotAnimation.interpolate({
-              inputRange: [0, 1],
-              outputRange: [1.2, 1.5]
-            })}] 
-          }
-        ]} />
-        <Animated.View style={[styles.loadingDot, { transform: [{ scale: dotScale }] }]} />
-      </View>
-    </Animated.View>
+    </View>
   );
 }
 
@@ -184,12 +179,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  content: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
   logoContainer: {
-    marginBottom: 20,
+    width: 150,
+    height: 150,
+    marginBottom: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // Effets visuels optionnels
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -197,15 +200,16 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   logo: {
-    width: 150,
-    height: 150,
-    tintColor: COLORS.primary, // Optionnel: si votre logo est blanc, il deviendra orange
+    width: '100%',
+    height: '100%',
+    // Optionnel: appliquer une teinte orange si votre logo est d'une autre couleur
+    // tintColor: COLORS.primary,
   },
   title: {
-    fontSize: 28,
+    fontSize: 36,
     fontWeight: 'bold',
     color: COLORS.primary,
-    marginBottom: 8,
+    marginBottom: 10,
     textShadowColor: 'rgba(247, 147, 30, 0.2)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
@@ -218,7 +222,8 @@ const styles = StyleSheet.create({
   loadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 40,
+    marginBottom: 20,
   },
   loadingDot: {
     width: 12,
@@ -229,5 +234,10 @@ const styles = StyleSheet.create({
   },
   loadingDotMiddle: {
     backgroundColor: COLORS.primary,
+  },
+  checkingText: {
+    fontSize: 14,
+    color: COLORS.accentLight,
+    marginTop: 10,
   },
 });
