@@ -172,7 +172,7 @@ export default function VoiturePage() {
             onPress={() => setShowAddModal(true)}
             activeOpacity={0.7}
           >
-            <Icon name="add-circle" size={24} color={Colors.white} />
+            {/* <Icon name="add-circle" size={24} color={Colors.white} /> */}
             <Text style={VoitureStyles.addButtonText}>
               Ajouter un véhicule
             </Text>

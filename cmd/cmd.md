@@ -33,6 +33,7 @@ adb --version
 npx expo prebuild
 
 cd android
+gradlew clean
 gradlew assembleDebug
 
 APK généré ici
