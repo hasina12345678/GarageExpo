@@ -1,4 +1,3 @@
-// styles/Paiement.css.js
 import { StyleSheet } from 'react-native';
 import { Colors, Fonts, Sizes, Layout, Components, Shadows } from './Common.css';
 
@@ -327,7 +326,7 @@ const PaiementStyles = StyleSheet.create({
     fontWeight: '600',
   },
   
-  // État vide (pas de pannes à payer)
+  // État vide 
   emptyState: {
     ...Layout.center,
     paddingVertical: Sizes.xl * 2,

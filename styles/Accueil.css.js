@@ -1,4 +1,3 @@
-// styles/Accueil.css.js
 import { StyleSheet } from 'react-native';
 import { Colors, Fonts, Sizes, Layout, Components, Shadows } from './Common.css';
 

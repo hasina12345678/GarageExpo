@@ -1,4 +1,3 @@
-// styles/Probleme.css.js
 import { StyleSheet } from 'react-native';
 import { Colors, Fonts, Sizes, Layout, Components, Shadows } from './Common.css';
 
@@ -308,7 +307,7 @@ const ProblemeStyles = StyleSheet.create({
     fontWeight: '600',
   },
   
-  // État vide (pas de voitures)
+  // État vide 
   emptyState: {
     ...Layout.center,
     paddingVertical: Sizes.xl * 2,
@@ -374,7 +373,7 @@ const ProblemeStyles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Voiture sélectionnée (affichage principal)
+  // Voiture sélectionnée 
 selectedVoitureContainer: {
   flexDirection: 'row',
   alignItems: 'center',
@@ -398,7 +397,7 @@ selectedVoitureDetails: {
   color: Colors.gray600,
 },
 
-// Scroll horizontal des voitures
+// Scroll horizontal 
 voitureScrollContainer: {
   marginHorizontal: -Sizes.xs,
 },

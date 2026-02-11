@@ -1,4 +1,3 @@
-// styles/ETU.css.js
 import { StyleSheet } from 'react-native';
 import { Colors, Fonts, Sizes, Layout, Shadows } from './Common.css';
 

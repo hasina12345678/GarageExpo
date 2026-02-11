@@ -1,4 +1,3 @@
-// styles/Login.css.js
 import { StyleSheet } from 'react-native';
 import { Colors, Sizes, Layout, Components, Fonts, Shadows } from './Common.css'; // AJOUTER Fonts et Shadows
 
@@ -15,17 +14,17 @@ const LoginStyles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: 12,
     padding: Sizes.xl,
-    ...Shadows.medium, // UTILISER Shadows
+    ...Shadows.medium, 
   },
   title: {
-    fontSize: Fonts.h2, // UTILISER Fonts
+    fontSize: Fonts.h2, 
     color: Colors.gray700,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: Sizes.xl,
   },
   label: {
-    fontSize: Fonts.body, // UTILISER Fonts
+    fontSize: Fonts.body, 
     color: Colors.gray600,
     marginBottom: Sizes.xs,
     fontWeight: '500',
@@ -37,7 +36,7 @@ const LoginStyles = StyleSheet.create({
   },
   errorText: {
     color: Colors.danger,
-    fontSize: Fonts.small, // UTILISER Fonts
+    fontSize: Fonts.small, 
     marginBottom: Sizes.sm,
     textAlign: 'center',
   },
@@ -55,7 +54,7 @@ const LoginStyles = StyleSheet.create({
   },
   linkText: {
     color: Colors.blue,
-    fontSize: Fonts.body, // UTILISER Fonts
+    fontSize: Fonts.body, 
     textDecorationLine: 'underline',
   },
 });

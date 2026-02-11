@@ -1,9 +1,8 @@
-// styles/Navbar.css.js
 import { StyleSheet } from 'react-native';
 import { Colors, Fonts, Sizes, Layout, Shadows } from './Common.css';
 
 const NavbarStyles = StyleSheet.create({
-  // Container principal - 100% width
+ 
   container: {
     width: '100%',
     backgroundColor: Colors.white,
@@ -13,7 +12,7 @@ const NavbarStyles = StyleSheet.create({
     marginTop: Sizes.md,
   },
   
-  // Header (première ligne avec logo et paramètres)
+  // Header 
   header: {
     ...Layout.row,
     ...Layout.spaceBetween,
@@ -24,7 +23,7 @@ const NavbarStyles = StyleSheet.create({
     width: '100%',
   },
   
-  // Logo/Title à gauche - sans icône
+  // Logo/Title 
   logoContainer: {
     ...Layout.row,
     ...Layout.alignCenter,
@@ -37,7 +36,7 @@ const NavbarStyles = StyleSheet.create({
     marginTop: 5, 
   },
   
-  // Paramètres/User menu à droite
+  // Paramètres/User
   settingsContainer: {
     ...Layout.row,
     ...Layout.alignCenter,
@@ -55,17 +54,17 @@ const NavbarStyles = StyleSheet.create({
   },
   
   logoImage: {
-    width: 100, // Ajustez cette valeur
-    height: 30, // Ajustez cette valeur
-    marginLeft: 0, // Optionnel pour l'alignement
+    width: 100, 
+    height: 30, 
+    marginLeft: 0,
     marginTop:9
 },
 
-  // Navigation principale - 100% width
+  // Navigation
   navContainer: {
     ...Layout.row,
     ...Layout.spaceBetween,
-    paddingHorizontal: 0, // Pas de padding horizontal pour 100% width
+    paddingHorizontal: 0,
     paddingVertical: Sizes.sm,
     backgroundColor: Colors.white,
     borderTopWidth: 1,
@@ -73,11 +72,11 @@ const NavbarStyles = StyleSheet.create({
     width: '100%',
   },
   
-  // Items de navigation - distribution égale
+  // Items de navigation 
   navItem: {
     ...Layout.column,
     ...Layout.center,
-    flex: 1, // Chaque item prend 1 part égale
+    flex: 1, 
     paddingVertical: Sizes.sm,
     minHeight: 60,
   },
@@ -91,7 +90,7 @@ const NavbarStyles = StyleSheet.create({
     backgroundColor: Colors.primary,
     ...Layout.center,
     marginBottom: Sizes.xs,
-    position: 'relative', // Important pour le positionnement du badge
+    position: 'relative',
   },
   navIconContainerActive: {
     backgroundColor: Colors.blue,
@@ -159,7 +158,6 @@ const NavbarStyles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
 
-  // === NOUVEAUX STYLES POUR LES NOTIFICATIONS ===
   
   // Badge de notification (petit point rouge)
   notificationBadge: {
@@ -203,7 +201,7 @@ const NavbarStyles = StyleSheet.create({
     lineHeight: Fonts.xsmall - 1,
   },
   
-  // Badge minimal (juste un point)
+  // Badge minimal
   notificationDot: {
     position: 'absolute',
     top: 2,

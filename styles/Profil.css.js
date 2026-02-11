@@ -1,4 +1,3 @@
-// styles/Profil.css.js
 import { StyleSheet } from 'react-native';
 import { Colors, Fonts, Sizes, Layout, Components, Shadows } from './Common.css';
 
@@ -216,10 +215,8 @@ const ProfilStyles = StyleSheet.create({
     right: Sizes.md,
     padding: Sizes.sm,
   },
-// Ajouter à la fin du StyleSheet.create :
   userIdText: {
     fontSize: Fonts.xsmall,
-    // fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
     color: Colors.gray600,
   },
   verifiedBadge: {
@@ -237,7 +234,6 @@ const ProfilStyles = StyleSheet.create({
     marginLeft: Sizes.xs,
     fontWeight: '500',
   },
-  // Ajouter un style center manquant
   center: {
     justifyContent: 'center',
     alignItems: 'center',

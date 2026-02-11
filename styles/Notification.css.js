@@ -1,4 +1,3 @@
-// styles/Notification.css.js
 import { StyleSheet } from 'react-native';
 import { Colors, Fonts, Sizes, Layout, Shadows } from './Common.css';
 
@@ -58,10 +57,10 @@ const NotificationStyles = StyleSheet.create({
   notificationUnread: {
     borderLeftWidth: 4,
     borderLeftColor: Colors.blue,
-    backgroundColor: Colors.blue + '10', // Léger fond bleu pour non lues
+    backgroundColor: Colors.blue + '10', 
   },
   
-  // En-tête de la carte (titre + bouton supprimer)
+  // En-tête de la carte 
   notificationHeader: {
     ...Layout.row,
     ...Layout.spaceBetween,
@@ -126,7 +125,7 @@ const NotificationStyles = StyleSheet.create({
     fontWeight: '600',
   },
   
-  // État vide (pas de notifications)
+  // État vide 
   emptyState: {
     ...Layout.center,
     paddingHorizontal: Sizes.xl,
@@ -269,8 +268,7 @@ const NotificationStyles = StyleSheet.create({
   typeUrgent: {
     backgroundColor: Colors.danger,
   },
-  
-  // Groupes par date
+ 
   dateGroup: {
     marginBottom: Sizes.lg,
   },
